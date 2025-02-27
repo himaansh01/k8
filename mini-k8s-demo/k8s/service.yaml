@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-app
+  namespace: mini-demo
+  labels:
+    app: flask-app
+spec:
+  # Service type: 
+  # - ClusterIP: Internal only (default)
+  # - NodePort: Exposes on Node IP at a static port
+  # - LoadBalancer: Exposes externally using cloud provider's load balancer
+  type: NodePort
+  
+  # Which pods to route traffic to (matches labels)
+  selector:
+    app: flask-app
+  
+  # Port mapping
+  ports:
+  - port: 80           # Port exposed by the service
+    targetPort: 5000   # Port the container accepts traffic on
+    nodePort: 30080    # Port on the node (range 30000-32767)
+    protocol: TCP

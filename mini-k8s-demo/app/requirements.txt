@@ -1,0 +1,4 @@
+# Updated dependencies with compatible versions
+Flask==2.2.3
+Werkzeug==2.2.3
+

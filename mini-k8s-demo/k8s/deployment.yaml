@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-app
+  namespace: mini-demo
+  labels:
+    app: flask-app
+spec:
+  # Number of identical pod replicas to maintain
+  replicas: 2
+  
+  # Selector defines how the Deployment finds which Pods to manage
+  selector:
+    matchLabels:
+      app: flask-app
+  
+  # Pod template defines what each Pod should look like
+  template:
+    metadata:
+      labels:
+        app: flask-app
+    spec:
+      containers:
+      - name: flask-app
+        # This refers to the image we'll build from our Dockerfile
+        image: mini-k8s-demo:latest
+        imagePullPolicy: Never  # Use local image (for Minikube)
+        
+        # Ports to expose from the container
+        ports:
+        - containerPort: 5000
+          name: http
+        
+        # Environment variables from ConfigMap
+        envFrom:
+        - configMapRef:
+            name: app-config
+        
+        # Resource limits and requests
+        resources:
+          requests:
+            cpu: "100m"     # 0.1 CPU core
+            memory: "64Mi"  # 64 MB of memory
+          limits:
+            cpu: "200m"     # 0.2 CPU core
+            memory: "128Mi" # 128 MB of memory
+        
+        # Health checks to determine if container is alive and ready
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 10
